@@ -24,80 +24,90 @@ object PlayGroundSparkHadoopImportData {
     println(s"*** Application Name: $applicationName ")
     println(s"**********************************************************************************")
 
-    val datasetEmployee = spark.sql("select * from company.employee_hive")
+    spark.sparkContext.setLogLevel("ERROR")
 
-    println("Quantidade de Empregados pela Tabela Hive: " + datasetEmployee.count)
+    val emp = Seq((1, "Smith", -1, "2018", "10", "M", 3000),
+      (2, "Rose", 1, "2010", "20", "M", 4000),
+      (3, "Williams", 1, "2010", "10", "M", 1000),
+      (4, "Jones", 2, "2005", "10", "F", 2000),
+      (5, "Brown", 2, "2010", "40", "", -1),
+      (6, "Brown", 2, "2010", "50", "", -1)
+    )
+    val empColumns = Seq("emp_id", "name", "superior_emp_id", "year_joined", "emp_dept_id", "gender", "salary")
+    import spark.sqlContext.implicits._
+    val empDF = emp.toDF(empColumns: _*)
+    empDF.show(false)
 
-    //datasetEmployee
-      //.cache
-      //.persist(StorageLevel.MEMORY_AND_DISK_2)
+    val dept = Seq(("Finance", 10),
+      ("Marketing", 20),
+      ("Sales", 30),
+      ("IT", 40)
+    )
 
-    datasetEmployee.show(10, false)
+    val deptColumns = Seq("dept_name", "dept_id")
+    val deptDF = dept.toDF(deptColumns: _*)
+    deptDF.show(false)
 
-    val datasetEmployeeHB = spark.sql(" select * from company.employee")
 
-    //datasetEmployeeHB
-      //.persist(StorageLevel.MEMORY_AND_DISK_2)
+    println("Inner join")
+    empDF.join(deptDF, empDF("emp_dept_id") === deptDF("dept_id"), "inner")
+      .show(false)
 
-    println("Quantidade de Empregados pela Tabela HBase: " + datasetEmployeeHB.count)
+    println("Outer join")
+    empDF.join(deptDF, empDF("emp_dept_id") === deptDF("dept_id"), "outer")
+      .show(false)
+    println("full join")
+    empDF.join(deptDF, empDF("emp_dept_id") === deptDF("dept_id"), "full")
+      .show(false)
+    println("fullouter join")
+    empDF.join(deptDF, empDF("emp_dept_id") === deptDF("dept_id"), "fullouter")
+      .show(false)
 
-    datasetEmployeeHB.show(10, false)
+    println("right join")
+    empDF.join(deptDF, empDF("emp_dept_id") === deptDF("dept_id"), "right")
+      .show(false)
+    println("rightouter join")
+    empDF.join(deptDF, empDF("emp_dept_id") === deptDF("dept_id"), "rightouter")
+      .show(false)
 
-    val datasetSalaries = spark.sql("select emp_no, salary, from_date, to_date, substr(from_date,1,4) ano, substr(from_date,6,2) mes from company.salaries")
+    println("left join")
+    empDF.join(deptDF, empDF("emp_dept_id") === deptDF("dept_id"), "left")
+      .show(false)
+    println("leftouter join")
+    empDF.join(deptDF, empDF("emp_dept_id") === deptDF("dept_id"), "leftouter")
+      .show(false)
 
-    //datasetSalaries
-      //.persist(StorageLevel.MEMORY_AND_DISK_2)
+    println("leftanti join")
+    empDF.join(deptDF, empDF("emp_dept_id") === deptDF("dept_id"), "leftanti")
+      .show(false)
 
-    println("Quantidade Salarios pela Tabela do Hive: " + datasetSalaries.count)
+    println("leftsemi join")
+    empDF.join(deptDF, empDF("emp_dept_id") === deptDF("dept_id"), "leftsemi")
+      .show(false)
 
-    //Todos os codigos de funcionarios utilizados
-    val dfFilterEmployee = datasetSalaries.select("emp_no").distinct
+    println("cross join")
+    empDF.join(deptDF, empDF("emp_dept_id") === deptDF("dept_id"), "cross")
+      .show(false)
 
-    //datasetEmployeeHB.filter(col("emp_no").isin(dfFilterEmployee.select("emp_no")))
-    //100GB/2000=X >2GB particao
+    println("Using crossJoin()")
+    empDF.crossJoin(deptDF).show(false)
 
-    val datasetTitles = spark.sql("select * from company.titles")
+    println("self join")
+    empDF.as("emp1").join(empDF.as("emp2"),
+        col("emp1.superior_emp_id") === col("emp2.emp_id"), "inner")
+      .select(col("emp1.emp_id"), col("emp1.name"),
+        col("emp2.emp_id").as("superior_emp_id"),
+        col("emp2.name").as("superior_emp_name"))
+      .show(false)
 
-    println("Quantidade Cargos dos Funcionarios pela Tabela do Hive: " + datasetTitles.count)
+    empDF.createOrReplaceTempView("EMP")
+    deptDF.createOrReplaceTempView("DEPT")
 
-    val datasetFinal = datasetEmployeeHB
-      .join(datasetSalaries,
-        datasetEmployeeHB.col("emp_no").equalTo(datasetSalaries.col("emp_no")),joinType = "left")
-      .join(datasetTitles,
-        datasetEmployeeHB.col("emp_no").equalTo(datasetTitles.col("emp_no")),joinType = "left")
-      .select(
-        datasetEmployeeHB.col("emp_no"),
-        datasetTitles.col("title"),
-        datasetSalaries.col("salary"),
-        datasetSalaries.col("to_date"),
-        datasetSalaries.col("ano"),
-        datasetSalaries.col("mes")
-      )
-      .filter(datasetEmployeeHB.col("emp_no").isNotNull)
+    //SQL JOIN
+    val joinDF = spark.sql("select * from EMP e, DEPT d where e.emp_dept_id == d.dept_id")
+    joinDF.show(false)
 
-    println("Quantidade Salarios pela Tabela do Hive: " + datasetFinal.count)
-
-    datasetFinal.show(50,false)
-
-    datasetFinal.write.mode(SaveMode.Overwrite).format("hive").partitionBy("ano", "mes").saveAsTable("company.salariesByYearMonth")
-
-    //datasetFinal.write.mode(SaveMode.Append).format("hive").saveAsTable("company.analise_employee_titles")
-/*
-    println("Iniciando a gravacao no hive")
-
-    datasetEmployee.write.mode(SaveMode.Append).format("hive").saveAsTable("company.employee_gravacao")
-
-    println("Gerando o arquivo")
-
-    datasetEmployee
-      .coalesce(1)
-      .write
-      .format("csv")
-      .option("sep", "|")
-      .option("header","true")
-      .mode("overwrite")
-      .save("/user/hadoop/")
-*/
-    spark.stop()
+    val joinDF2 = spark.sql("select * from EMP e INNER JOIN DEPT d ON e.emp_dept_id == d.dept_id")
+    joinDF2.show(false)
   }
 }
