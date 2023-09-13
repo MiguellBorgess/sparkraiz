@@ -100,14 +100,5 @@ object PlayGroundSparkHadoopImportData {
         col("emp2.name").as("superior_emp_name"))
       .show(false)
 
-    empDF.createOrReplaceTempView("EMP")
-    deptDF.createOrReplaceTempView("DEPT")
-
-    //SQL JOIN
-    val joinDF = spark.sql("select * from EMP e, DEPT d where e.emp_dept_id == d.dept_id")
-    joinDF.show(false)
-
-    val joinDF2 = spark.sql("select * from EMP e INNER JOIN DEPT d ON e.emp_dept_id == d.dept_id")
-    joinDF2.show(false)
   }
 }
