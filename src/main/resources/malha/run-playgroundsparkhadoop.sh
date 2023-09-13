@@ -5,7 +5,7 @@ export BASEDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 HADOOP_CLASSPATH=$(hadoop classpath)
 HBASE_CLASSPATH=$(hbase classpath)
-HIVE_CLASSPATH=/opt/hive/lib/*
+HIVE_CLASSPATH=/usr/lib/hive/lib/*
 
 export SPARK_DIST_CLASSPATH=$HIVE_CLASSPATH:$HBASE_CLASSPATH:$HADOOP_CLASSPATH
 
