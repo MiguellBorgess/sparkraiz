@@ -4,14 +4,13 @@ scalaVersion := "2.13.14"
 
 val sparkVersion = "3.5.2"
 val hadoopVersion = "3.3.6"
-val sftpVersion = "1.1.3"
 
 libraryDependencies ++= Seq(
   "org.apache.spark" %% "spark-core"    % sparkVersion % "provided",
   "org.apache.spark" %% "spark-sql"     % sparkVersion % "provided",
   "org.apache.spark" %% "spark-hive"    % sparkVersion % "provided",
-  "com.springml" % "spark-sftp_2.11"    % sftpVersion,
-  "org.apache.hadoop" % "hadoop-common" % hadoopVersion % "provided"
+  "org.apache.hadoop" % "hadoop-common" % hadoopVersion % "provided",
+  "org.scala-lang" % "scala-library" % "2.13.14"
 )
 
 assemblyMergeStrategy in assembly := {
@@ -29,6 +28,5 @@ assemblyMergeStrategy in assembly := {
 
 resolvers ++= Seq(
   "spark-core" at "https://mvnrepository.com/artifact/org.apache.spark/spark-core",
-  "spark-sql" at "https://mvnrepository.com/artifact/org.apache.spark/spark-sql",
-  "spark-sftp" at "https://mvnrepository.com/artifact/com.springml/spark-sftp"
+  "spark-sql" at "https://mvnrepository.com/artifact/org.apache.spark/spark-sql"
 )
