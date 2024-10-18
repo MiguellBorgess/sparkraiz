@@ -11,8 +11,8 @@ object PlayGroundSparkHadoopImportData {
     val spark : SparkSession = SparkSession
       .builder()
       .appName(s"play-ground-spark-hadoop")
-      .config("hive.exec.dynamic.partition.mode","nonstrict")
-      .config("hive.exec.dynamic.partition","true")
+//      .config("hive.exec.dynamic.partition.mode","nonstrict")
+//      .config("hive.exec.dynamic.partition","true")
       .enableHiveSupport()
       .getOrCreate()
 
