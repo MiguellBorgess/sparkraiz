@@ -1,6 +1,6 @@
 @echo off
 REM Defina o diretório onde o Spark está instalado
-set SPARK_HOME=C:\spark\spark-3.5.2-bin-hadoop3-scala2.13
+set SPARK_HOME=C:\Spark\spark-3.5.5-bin-hadoop3-scala2.13
 
 REM Defina o caminho para o script ou arquivo jar que deseja executar
 set APP_PATH=PlayGroundSparkHadoop-assembly-0.1.jar
@@ -14,7 +14,7 @@ set DRIVER_MEMORY=2G
 set EXECUTOR_MEMORY=2G
 
 REM Caminho para o arquivo de logs, se necessário
-set LOG_PATH=C:\users\vsevaios\playground-spark\log.txt
+set LOG_PATH=C:\Users\mperebor\spark-29032025\log.txt
 
 REM Execute o spark-submit
 %SPARK_HOME%\bin\spark-submit ^

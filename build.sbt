@@ -2,7 +2,7 @@ name := "PlayGroundSparkHadoop"
 version := "0.1"
 scalaVersion := "2.13.14"
 
-val sparkVersion = "3.5.2"
+val sparkVersion = "3.5.5"
 val hadoopVersion = "3.3.6"
 
 libraryDependencies ++= Seq(
@@ -10,7 +10,7 @@ libraryDependencies ++= Seq(
   "org.apache.spark" %% "spark-sql"     % sparkVersion % "provided",
   "org.apache.spark" %% "spark-hive"    % sparkVersion % "provided",
   "org.apache.hadoop" % "hadoop-common" % hadoopVersion % "provided",
-  "org.scala-lang" % "scala-library" % "2.13.14"
+  "org.scala-lang" % "scala-library" % "2.13.16"
 )
 
 assemblyMergeStrategy in assembly := {
