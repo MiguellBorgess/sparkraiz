@@ -41,7 +41,7 @@ object Exemplo1 {
     // Escrevendo os dados no formato Parquet
     df.write
       .mode("overwrite") // Sobrescreve se o arquivo já existir
-      .parquet("c:\\users\\vsevaios\\playground-spark\\data\\pessoas")
+      .parquet("C:\\Users\\mperebor\\spark-29032025\\playground-spark\\data\\pessoas")
 
     // Encerrando a sessão Spark
     spark.stop()
